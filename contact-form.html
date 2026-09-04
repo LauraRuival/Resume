@@ -12,6 +12,11 @@
     button { background-color: #007bff; color: white; padding: 10px 15px; border: none; cursor: pointer; width: 100%; }
     button:disabled { background-color: #cccccc; }
     #status { margin-top: 15px; text-align: center; font-weight: bold; }
+    /* Honey Pot field to trap spam bots */
+    .hidden-field {
+      display: none !important;
+      visibility: hidden;
+    }
   </style>
 </head>
 <body>
@@ -30,6 +35,10 @@
       <label for="message">Message</label>
       <textarea id="message" rows="5" required></textarea>
     </div>
+    <div class="form-group hidden-field">
+      <label for="honeypot">Leave this field blank</label>
+      <input type="text" id="honeypot" autocomplete="off" tabindex="-1">
+    </div>
     <button type="submit" id="submitBtn">Send Message</button>
   </form>
 
@@ -37,7 +46,7 @@
 
   <script>
     // Paste your Google Web App URL here
-    const WEB_APP_URL = 'YOUR_WEB_APP_URL_HERE';
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwR-gsamnrjQyVSO675G7p0Q56FsarPmiwncPixDh4HPz1R4_so6EYWWt4RFrKcO2HC/exec';
 
     const form = document.getElementById('contactForm');
     const submitBtn = document.getElementById('submitBtn');
@@ -46,6 +55,19 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault(); // Stop page reload
 
+      // 1. Check the honeypot field
+      const honeypotValue = document.getElementById('honeypot').value;
+      if (honeypotValue.trim() !== "") {
+        console.log("Bot detected!");
+        // Trick the bot into thinking it succeeded without sending anything
+        statusText.style.color = 'green';
+        statusText.textContent = 'Thank you! Your message has been sent.';
+        form.reset();
+        return; // Stop the function here
+      }
+
+  // 2. Your normal code continues below if it's a human...
+  // 
       // Update UI state
       submitBtn.disabled = true;
       statusText.style.color = 'black';
