@@ -1,0 +1,37 @@
+function doPost(e) {
+  try {
+    // 1. Open the active spreadsheet
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    
+    // 2. Parse the incoming JSON data from GitHub Pages
+    var data = JSON.parse(e.postData.contents);
+    
+    // 3. Prepare the row data matching your headers
+    var timestamp = new Date();
+    var name = data.name || "N/A";
+    var email = data.email || "N/A";
+    var message = data.message || "N/A";
+    
+    // 4. Append data to the Google Sheet
+    sheet.appendRow([timestamp, name, email, message]);
+    
+    // 5. Send an email notification to YOUR inbox
+    var myEmail = Session.getActiveUser().getEmail(); 
+    var subject = "New Contact Form Submission from " + name;
+    var body = "You received a new message:\n\n" +
+               "Name: " + name + "\n" +
+               "Email: " + email + "\n\n" +
+               "Message:\n" + message;
+               
+    MailApp.sendEmail(myEmail, subject, body);
+    
+    // 6. Return a success response to your JavaScript
+    return ContentService.createTextOutput(JSON.stringify({ "result": "success" }))
+                         .setMimeType(ContentService.MimeType.JSON);
+                         
+  } catch (error) {
+    // Return an error response if something goes wrong
+    return ContentService.createTextOutput(JSON.stringify({ "result": "error", "error": error.toString() }))
+                         .setMimeType(ContentService.MimeType.JSON);
+  }
+}
