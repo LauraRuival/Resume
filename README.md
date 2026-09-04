@@ -1,2 +1,2 @@
 # Portfolio
-My online resume and samples of my work
+My online portfolio and samples of my work
